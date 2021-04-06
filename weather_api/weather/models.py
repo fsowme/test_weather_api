@@ -5,6 +5,7 @@ class City(models.Model):
     name = models.CharField(verbose_name="City name", max_length=200)
     latitude = models.FloatField(verbose_name="Latitude")
     longitude = models.FloatField(verbose_name="Longitude")
+    country = models.CharField(verbose_name="Country", max_length=200)
 
     class Meta:
         ordering = ["name"]
