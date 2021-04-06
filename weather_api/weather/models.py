@@ -10,10 +10,12 @@ class City(models.Model):
         ordering = ["name"]
         verbose_name = "City"
         verbose_name_plural = "Cities"
-        constraints = models.UniqueConstraint(
-            fields=["latitude", "longitude"],
-            name="%(app_label)s_%(class)s_check_fields_unique",
-        )
+        constraints = [
+            models.UniqueConstraint(
+                fields=["latitude", "longitude"],
+                name="%(app_label)s_%(class)s_check_fields_unique",
+            )
+        ]
 
     def __str__(self):
         return self.name
@@ -33,10 +35,12 @@ class Weather(models.Model):
         ordering = ["city", "date"]
         verbose_name = "Weather"
         verbose_name_plural = "Weather"
-        constraints = models.UniqueConstraint(
-            fields=["city", "date"],
-            name="%(app_label)s_%(class)s_check_fields_unique",
-        )
+        constraints = [
+            models.UniqueConstraint(
+                fields=["city", "date"],
+                name="%(app_label)s_%(class)s_check_fields_unique",
+            )
+        ]
 
     def __str__(self):
         return f"Weather in {self.city.name} ({self.city.pk})"

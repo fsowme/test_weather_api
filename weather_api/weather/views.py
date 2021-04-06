@@ -1,3 +1,5 @@
-from django.shortcuts import render
+from django.http.response import HttpResponse
 
-# Create your views here.
+
+def weather_test(request):
+    return HttpResponse("Weather ok")
