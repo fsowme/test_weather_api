@@ -36,17 +36,17 @@ class WeatherByHour(BaseModel):
         fields = {"temp": "main"}
 
 
-class OpenWeatherDaily(BaseModel):
+class OWDaily(BaseModel):
     city: CityData
     data: list[WeatherByDay]
 
 
-class OpenWeatherHourly(BaseModel):
+class OWHourly(BaseModel):
     city: CityData
     data: list[WeatherByHour]
 
 
-class OpenWeatherCurrent(BaseModel):
+class OWCurrent(BaseModel):
     city: CityData
     data: TempDay
     dt: int
@@ -55,7 +55,7 @@ class OpenWeatherCurrent(BaseModel):
         fields = {"data": "main", "dt": "time"}
 
 
-class WeatherBitCities(BaseModel):
+class WBCities(BaseModel):
     name: str
     lat: float
     lon: float
@@ -63,3 +63,23 @@ class WeatherBitCities(BaseModel):
 
     class Config:
         fields = {"name": "city_name", "country": "country_code"}
+
+
+class WBData(BaseModel):
+    lon: float
+    lat: float
+    name: str
+    country: str
+    date: int
+    temp: float
+
+    class Config:
+        fields = {
+            "name": "city_name",
+            "country": "country_code",
+            "date": "ts",
+        }
+
+
+class WBCurrent(BaseModel):
+    data: list[WBData]
