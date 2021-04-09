@@ -4,7 +4,7 @@ import io
 import json
 import logging
 import os
-from abc import ABCMeta, abstractmethod
+from abc import ABC, ABCMeta, abstractmethod
 from datetime import datetime
 
 import django
@@ -37,11 +37,19 @@ WEATHERBIT = Source.objects.get(name="WeatherBit")
 logger = logging.getLogger(__name__)
 
 
-class Downloader:
+class Downloader(ABC):
     __metaclass__ = ABCMeta
 
     @abstractmethod
     def get_data(self):
+        pass
+
+
+class Saver(ABC):
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
+    def create(self):
         pass
 
 
@@ -83,14 +91,6 @@ class WBDownloaderWeather(DownloaderGz):
         if self.data:
             return [json.loads(line) for line in self.data]
         raise LookupError("Data not load")
-
-
-class Saver:
-    __metaclass__ = ABCMeta
-
-    @abstractmethod
-    def create(self):
-        pass
 
 
 class WeatherCitySaver(Saver):
@@ -234,22 +234,28 @@ def get_wb_weather(cities, pattern_url, data_downloader, key=None):
 
 
 if __name__ == "__main__":
-
-    weather_downloader = WBDownloaderWeather(OW_FORECAST_16_DAYS)
+    # Download and save 16 days/daily forecast OpenWeather.
+    weather_downloader = OWDownloaderWeather(OW_FORECAST_16_DAYS)
     weather_downloader.get_data()
     OWSaverDaily(weather_downloader.from_json()[:5]).create()
 
+    # Download and save 5 days/3 hour forecast OpenWeather.
     weather_downloader = OWDownloaderWeather(OW_FORECAST_5_DAYS)
     weather_downloader.get_data()
     OWSaverHourly(weather_downloader.from_json()[:7]).create()
 
+    # Download and save current weather OpenWeather.
     weather_downloader = OWDownloaderWeather(OW_CURRENT)
     weather_downloader.get_data()
     OWSaverCurrent(weather_downloader.from_json()[:20]).create()
 
+    # Download and save cities from WeatherBit.
     cities_downloader = DownloaderCity(WB_CITIES)
     cities_downloader.get_data()
     WBSaverCity(cities_downloader.from_json()[:40]).create()
+
+    # Asynchronously in a loop download current weather from WeatherBit.
+    # Over api.
     cities_qs = City.objects.filter(source__pk=2)[15:20]
     wb_data = get_wb_weather(
         cities_qs, WB_CURRENT, WBDownloaderWeather, API_KEY
